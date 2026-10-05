@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#f4ecdc">
+<title>에브루 공방 · Ebru Atölyesi</title>
+<meta name="description" content="물 위에 물감을 떨어뜨리고 송곳과 빗으로 무늬를 그려 종이에 찍어내는 터키 전통 마블링, 에브루를 브라우저에서 체험해 보세요.">
+<meta property="og:title" content="에브루 공방 · Ebru Atölyesi">
+<meta property="og:description" content="물 위에 물감을 떨어뜨리고 송곳과 빗으로 무늬를 그려 종이에 찍어내는 터키 전통 마블링, 에브루를 브라우저에서 체험해 보세요.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ink:#1d2a44; --paper:#f4ecdc; --madder:#a8322d; --gold:#b8893b; --wood:#7a5232;
+  --ink-80:rgba(29,42,68,.8); --ink-60:rgba(29,42,68,.6); --ink-45:rgba(29,42,68,.45);
+  --ink-10:rgba(29,42,68,.1); --ink-05:rgba(29,42,68,.05);
+  --display:"Gowun Batang","Noto Serif KR",serif;
+  --sans:"IBM Plex Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --gap:clamp(6px,1.2vmin,14px);
+  --btn:clamp(40px,6.4vmin,54px);
+  --dot:clamp(22px,4.2vmin,34px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+  background-color:var(--paper);
+  background-image:radial-gradient(circle at 12% 0,#b8893b24,#0000 40%),radial-gradient(circle at 100% 30%,#233a6b14,#0000 45%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .3 0 0 0 0 .15 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.38;cursor:default}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- 전체 틀 ---------- */
+.app{
+  height:100vh;height:var(--app-h,100dvh);
+  display:grid;grid-template-rows:auto minmax(0,1fr);
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:clamp(6px,1.4vmin,14px) clamp(10px,2vw,22px) 0}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:clamp(30px,5vmin,38px);height:auto;flex:none}
+.brand b{font-family:var(--display);font-size:clamp(16px,2.4vmin,20px);display:block;line-height:1.1;white-space:nowrap}
+.brand i{font-size:11px;color:var(--ink-60);display:block;letter-spacing:.03em}
+.hbtns{display:flex;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid var(--ink-10);background:rgba(255,255,255,.55);transition:background .15s,border-color .15s}
+.chip:hover{background:#fff;border-color:rgba(168,50,45,.4)}
+.chip.icon{width:36px;padding:0;justify-content:center}
+
+main{
+  min-height:0;display:grid;gap:var(--gap);
+  padding:var(--gap) clamp(10px,2vw,22px) clamp(8px,1.6vmin,16px);
+  grid-template-areas:"stage" "patterns" "tools" "colors" "actions";
+  grid-template-rows:minmax(0,1fr) auto auto auto auto;
+  grid-template-columns:minmax(0,1fr);
+}
+.stage{grid-area:stage;min-height:0;min-width:0;display:grid;place-items:center;position:relative}
+.tools{grid-area:tools}
+.patterns{grid-area:patterns}
+.colors{grid-area:colors}
+.actions{grid-area:actions}
+
+/* ---------- 물판 ---------- */
+.tray{
+  position:relative;padding:clamp(5px,1vmin,10px);border-radius:12px;
+  background:linear-gradient(135deg,#8a5f3a,#5f3d22 55%,#7d5433);
+  box-shadow:0 10px 30px -12px rgba(60,35,15,.55),inset 0 1px 0 rgba(255,255,255,.18);
+}
+.water{position:relative;overflow:hidden;border-radius:6px;width:100%;height:100%}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:cell}
+#ov{position:absolute;inset:0;pointer-events:none}
+canvas.pull{cursor:crosshair}
+.sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.16),transparent 35%,transparent 65%,rgba(255,255,255,.08));mix-blend-mode:soft-light}
+.hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;transition:opacity .3s}
+.hint span{background:rgba(255,255,255,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:999px;padding:9px 18px;font-size:clamp(13px,1.9vmin,16px);box-shadow:0 1px 4px rgba(0,0,0,.08);text-align:center;margin:0 12px}
+.hint.off{opacity:0}
+.spread{position:absolute;left:10px;top:10px;font-size:12px;color:#fff;background:rgba(168,50,45,.85);border-radius:999px;padding:3px 10px;pointer-events:none;opacity:0;transition:opacity .2s}
+.spread.on{opacity:1}
+.paper-sheet{position:absolute;inset:0;background:#f8f2e4;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-style:italic;color:rgba(29,42,68,.35);font-size:28px;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:paper-down 1.1s cubic-bezier(.4,0,.2,1) both}
+.paper-sheet.lift{animation:paper-up .75s cubic-bezier(.4,0,.2,1) both}
+@keyframes paper-down{0%{opacity:.6;transform:translateY(-105%) rotate(-3deg)}to{opacity:1;transform:none}}
+@keyframes paper-up{0%{transform:none}to{transform:translateY(-110%) rotate(4deg)}}
+
+/* ---------- 도구 ---------- */
+.tools{display:flex;align-items:center;gap:var(--gap)}
+.toolset{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;flex:1 1 auto;padding:4px;border-radius:14px;background:rgba(255,255,255,.5);border:1px solid var(--ink-10)}
+.tool{height:var(--btn);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--ink-80);transition:background .15s,color .15s;position:relative}
+.tool:hover{background:var(--ink-05)}
+.tool.on{background:var(--ink);color:var(--paper);box-shadow:0 3px 8px -3px rgba(0,0,0,.35)}
+.tool small{font-size:12px;font-weight:600;line-height:1}
+.size{display:flex;align-items:center;gap:8px;flex:0 1 190px;min-width:110px;font-size:12px;color:var(--ink-60)}
+.size input{flex:1;min-width:0;accent-color:var(--madder)}
+.size output{font-variant-numeric:tabular-nums;width:2ch;text-align:right}
+.size .bubble{width:16px;height:16px;border-radius:50%;flex:none;background:var(--cur,#233a6b);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+
+/* ---------- 전통 기법 ---------- */
+.patterns{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:linear-gradient(180deg,rgba(184,137,59,.16),rgba(184,137,59,.08));border:1px solid rgba(184,137,59,.38)}
+.patterns .head{display:none}
+.pat{min-height:clamp(36px,5.4vmin,48px);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px 2px;background:rgba(255,255,255,.6);transition:background .15s,transform .15s,box-shadow .15s;text-align:center;line-height:1.1}
+.pat:hover{background:#fff;box-shadow:0 2px 6px -2px rgba(122,82,50,.35)}
+.pat:active{transform:scale(.96)}
+.pat b{font-family:var(--display);font-size:clamp(12.5px,1.9vmin,15px);font-weight:700;word-break:keep-all}
+.pat i{font-size:10px;color:var(--ink-60);white-space:nowrap}
+.pat.flash{background:var(--gold);color:#fff}.pat.flash i{color:rgba(255,255,255,.85)}
+@media (max-width:420px){.pat i{display:none}}
+
+/* ---------- 물감 ---------- */
+.colors{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;justify-items:center}
+.pig{width:var(--dot);height:var(--dot);border-radius:50%;position:relative;box-shadow:inset 0 -3px 6px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18);transition:transform .15s}
+.pig:hover{transform:scale(1.08)}
+.pig.on{outline:2.5px solid var(--ink);outline-offset:2.5px}
+.colors .label{display:none}
+
+/* ---------- 하단 액션 ---------- */
+.actions{display:flex;align-items:center;gap:6px}
+.status{flex:1;min-width:0;font-size:13px;color:var(--ink-60);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status b{color:var(--ink)}
+.abtn{height:44px;min-width:44px;padding:0 12px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:500;border:1px solid var(--ink-10);background:rgba(255,255,255,.6);transition:background .15s,border-color .15s;white-space:nowrap}
+.abtn:hover:not(:disabled){background:#fff;border-color:rgba(29,42,68,.25)}
+.abtn.primary{background:var(--madder);border-color:var(--madder);color:#fff;padding:0 18px;font-weight:600}
+.abtn.primary:hover:not(:disabled){background:#922a26}
+.abtn .t{display:inline}
+
+/* ---------- 세로(모바일) 미세조정 ---------- */
+@media (max-width:599px), (max-aspect-ratio:5/4){
+  .status{display:none}
+  .actions .abtn.icononly .t{display:none}
+  .actions{justify-content:space-between}
+  .actions .abtn.primary{flex:1}
+  .size{flex:0 0 auto;min-width:0;flex-direction:column;gap:2px;align-items:stretch;width:clamp(84px,24vw,150px)}
+  .size .row{display:flex;justify-content:space-between;align-items:center}
+}
+@media (max-width:380px){
+  .chip .t{display:none}.chip{width:36px;padding:0;justify-content:center}
+  .tool small{font-size:11px}
+}
+
+/* ---------- 가로(태블릿·데스크톱·가로폰) ---------- */
+@media (min-width:600px) and (min-aspect-ratio:5/4){
+  main{
+    grid-template-areas:"patterns stage colors" "tools stage colors" "tools actions colors";
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-rows:auto minmax(0,1fr) auto;
+  }
+  .tools{flex-direction:column;align-items:stretch;justify-content:flex-start;width:clamp(76px,8.5vw,104px)}
+  .toolset{grid-template-columns:1fr;flex:0 0 auto}
+  .patterns{grid-template-columns:1fr;width:clamp(76px,8.5vw,104px);padding:6px}
+  .patterns .head{display:block;font-size:11px;letter-spacing:.12em;color:#7a5232;font-weight:600;text-align:center;padding:2px 0}
+  .pat i{display:none}
+  .tool{height:auto;padding:clamp(6px,1.3vmin,12px) 0}
+  .size{flex-direction:column;align-items:stretch;flex:0 0 auto;min-width:0;padding:10px 8px;border-radius:14px;background:rgba(255,255,255,.5);border:1px solid var(--ink-10)}
+  .size .row{display:flex;justify-content:space-between;align-items:center}
+  .colors{grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:clamp(4px,1vmin,10px) 8px;padding:10px;border-radius:14px;background:rgba(255,255,255,.5);border:1px solid var(--ink-10);height:max-content}
+  .colors .head{grid-column:1/-1;justify-self:stretch;font-size:11px;letter-spacing:.16em;color:var(--ink-60);font-weight:600;text-align:center}
+}
+@media (min-width:600px) and (min-aspect-ratio:5/4) and (min-height:640px){
+  .colors{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (min-width:600px) and (min-aspect-ratio:5/4) and (max-height:640px){
+  main{grid-template-areas:"tools patterns colors" "tools stage colors" "tools actions colors"}
+  .patterns{grid-template-columns:repeat(5,minmax(0,1fr));width:auto;padding:4px}
+  .patterns .head{display:none}
+  .pat{min-height:34px}
+  .pat i{display:block}
+}
+/* 낮은 화면(가로폰 등): 더 압축 */
+@media (max-height:520px){
+  header{padding-top:4px}
+  .brand i,.tool small{display:none}
+  .chip{height:32px}.chip.icon{width:32px}
+  .abtn{height:38px}
+  .size .row span{display:none}
+}
+.colors .head{display:none}
+@media (min-width:600px) and (min-aspect-ratio:5/4) and (min-height:521px){.colors .head{display:block}}
+
+/* ---------- 시트 / 모달 ---------- */
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(29,42,68,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.open{opacity:1;pointer-events:auto}
+.card{position:relative;width:min(560px,100%);max-height:100%;overflow:auto;background:#fbf7ee;border-radius:18px;padding:clamp(16px,3vmin,26px);box-shadow:0 20px 50px -10px rgba(0,0,0,.35);transform:translateY(12px) scale(.98);transition:transform .2s}
+.scrim.open .card{transform:none}
+.close{position:absolute;right:10px;top:10px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center}
+.close:hover{background:var(--ink-10)}
+.card h2{font-family:var(--display);font-size:clamp(20px,3vmin,26px);margin:0 0 4px;font-weight:700}
+.card .eyebrow{font-size:11px;letter-spacing:.28em;color:var(--madder);font-weight:600;margin:0}
+.card p{line-height:1.6;color:var(--ink-80);font-size:14px;margin:6px 0 0}
+.sec{font-size:12px;letter-spacing:.16em;font-weight:600;color:var(--ink-60);margin:16px 0 8px}
+.sec em{font-family:var(--display);letter-spacing:0;font-weight:400;color:var(--ink-45)}
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.preset{text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--ink-10);background:rgba(244,236,220,.7);transition:background .15s,border-color .15s}
+.preset:hover{background:#fff;border-color:rgba(168,50,45,.4)}
+.preset b{display:block;font-size:15px}
+.preset span{display:block;font-size:12px;color:var(--ink-60);margin-top:2px;line-height:1.35}
+.bgs{display:flex;flex-wrap:wrap;gap:10px}
+.bg{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--ink-60)}
+.bg i{width:40px;height:40px;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.bg.on i{outline:2.5px solid var(--ink);outline-offset:2px}
+.demo{margin-top:16px;width:100%;height:46px;border-radius:12px;border:1px dashed rgba(29,42,68,.35);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:500}
+.demo:hover{background:var(--ink-05)}
+.tabs{display:flex;gap:4px;margin:12px 0 4px;padding:4px;background:var(--ink-05);border-radius:12px}
+.tabs button{flex:1;height:34px;border-radius:9px;font-size:14px;font-weight:500;color:var(--ink-60)}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.steps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;padding:0;list-style:none}
+.steps li{padding:10px;border-radius:12px;background:rgba(255,255,255,.7);border:1px solid var(--ink-10)}
+.steps b{font-family:var(--display);color:var(--gold);font-size:18px;margin-right:6px}
+.steps strong{font-size:14px}
+.steps p{font-size:12.5px;margin-top:2px;line-height:1.5}
+.dict{display:grid;gap:8px;margin-top:10px}
+.dict div{border-left:3px solid var(--ink);padding:2px 0 2px 10px}
+.dict strong{font-family:var(--display);font-size:16px}
+.dict em{font-size:12px;color:var(--ink-45);margin-left:6px}
+.dict p{font-size:13px;margin-top:2px}
+.keys{font-size:12px;color:var(--ink-60);margin-top:14px;line-height:1.6}
+kbd{font-family:var(--sans);font-size:11px;border:1px solid var(--ink-10);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:#fff}
+.result img{display:block;width:100%;max-height:min(48vh,48dvh);object-fit:contain;border-radius:4px;box-shadow:0 6px 20px -8px rgba(0,0,0,.4);background:#f8f2e4}
+.frame{margin-top:14px;padding:10px;background:#fff;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.rbtns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}
+.rbtns .abtn{text-decoration:none;color:inherit}
+@media (max-width:420px){.steps{grid-template-columns:1fr}.rbtns .abtn{flex:1}}
+@media (min-width:600px) and (max-width:899px){.status{display:none}.actions{justify-content:center}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#233a6b"/><path d="M20 4a16 16 0 0 1 0 32c6-4 6-10 0-16s-6-12 0-16Z" fill="#c58b3a"/><circle cx="20" cy="13" r="3.2" fill="#f4efe4"/><circle cx="20" cy="27" r="3.2" fill="#a8322d"/></svg>
+      <div><b>에브루 공방</b><i>Ebru Atölyesi · 터키 전통 마블링</i></div>
+    </div>
+    <div class="hbtns">
+      <button class="chip" id="btnDemo" title="장인이 바탕부터 무늬까지 시연해요"><svg class="i"><use href="#ic-wand"/></svg><span class="t">장인 시연</span></button>
+      <button class="chip icon" id="btnAbout" title="에브루란?" aria-label="에브루란?"><svg class="i"><use href="#ic-info"/></svg></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stage" id="stage">
+      <div class="tray" id="tray">
+        <div class="water">
+          <canvas id="cv" aria-label="물판. 눌러서 물감을 떨어뜨리세요"></canvas>
+          <canvas id="ov" aria-hidden="true"></canvas>
+          <div class="sheen"></div>
+          <div class="hint" id="hint"><span>물 위를 눌러 물감을 떨어뜨려 보세요</span></div>
+          <div class="spread" id="spread">물감이 퍼지는 중</div>
+          <div id="paperSlot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="patterns" id="presets" role="group" aria-label="전통 기법"><div class="head">전통 기법</div></div>
+
+    <div class="tools">
+      <div class="toolset" id="toolset" role="radiogroup" aria-label="도구"></div>
+      <label class="size">
+        <div class="row"><span id="sizeLabel">방울 크기</span><output id="sizeOut">34</output></div>
+        <input type="range" id="size" min="10" max="70" value="34" aria-label="크기">
+      </label>
+    </div>
+
+    <div class="colors" id="colors" role="radiogroup" aria-label="물감"><div class="head">물감</div></div>
+
+    <div class="actions">
+      <div class="status" id="status"></div>
+      <button class="abtn icononly" id="btnUndo" disabled title="되돌리기 (Ctrl/⌘+Z)"><svg class="i"><use href="#ic-undo"/></svg><span class="t">되돌리기</span></button>
+      <button class="abtn icononly" id="btnClear" title="비우기"><svg class="i"><use href="#ic-eraser"/></svg><span class="t">비우기</span></button>
+      <button class="abtn icononly" id="btnMore" title="물판 바탕색"><svg class="i"><use href="#ic-palette"/></svg><span class="t">바탕</span></button>
+      <button class="abtn primary" id="btnPrint">종이에 찍기</button>
+    </div>
+  </main>
+</div>
+
+<!-- 바탕 시트 -->
+<div class="scrim" id="sheetMore" aria-hidden="true">
+  <div class="card" role="dialog" aria-label="물판 바탕">
+    <button class="close" data-close aria-label="닫기"><svg class="i"><use href="#ic-x"/></svg></button>
+    <p class="eyebrow">ZEMİN</p>
+    <h2>물판 바탕</h2>
+    <p>물의 색을 바꾸면 무늬의 분위기가 달라져요.</p>
+    <div class="sec">바탕색</div>
+    <div class="bgs" id="bgs"></div>
+    <button class="demo" data-demo><svg class="i"><use href="#ic-wand"/></svg> 장인 시연 보기</button>
+  </div>
+</div>
+
+<!-- 소개 -->
+<div class="scrim" id="sheetAbout" aria-hidden="true">
+  <div class="card" role="dialog" aria-label="에브루 소개">
+    <button class="close" data-close aria-label="닫기"><svg class="i"><use href="#ic-x"/></svg></button>
+    <p class="eyebrow">EBRU NEDİR?</p>
+    <h2>구름의 예술, 에브루</h2>
+    <div class="tabs" id="aboutTabs">
+      <button class="on" data-tab="0">에브루란?</button>
+      <button data-tab="1">만드는 법</button>
+      <button data-tab="2">무늬 사전</button>
+    </div>
+    <div data-panel="0">
+      <p>‘에브루(ebru)’는 페르시아어 <em>아브리(abrî)</em>, ‘구름 같은’에서 왔다고 전해집니다. 15세기 무렵부터 오스만 제국에서 책 표지와 서예 작품의 바탕, 공문서의 위조 방지용 종이로 쓰였고, 2014년 유네스코 인류무형문화유산에 등재되었습니다.</p>
+      <p>이 공방의 물판은 실제 물감이 퍼지고 끌려가는 원리를 수학적으로 따라 합니다. 방울은 서로를 밀어낼 뿐 섞이지 않기 때문에, 아무리 저어도 색이 탁해지지 않아요.</p>
+      <p class="keys"><b>팁</b> · 바탕색과 대비되는 색을 먼저, 밝은 색을 마지막에 떨구면 무늬가 또렷해져요.<br>단축키 <kbd>1</kbd>–<kbd>4</kbd> 도구 · <kbd>Ctrl/⌘</kbd>+<kbd>Z</kbd> 되돌리기 · <kbd>P</kbd> 종이에 찍기</p>
+    </div>
+    <div data-panel="1" hidden><ol class="steps" id="steps"></ol></div>
+    <div data-panel="2" hidden><div class="dict" id="dict"></div></div>
+  </div>
+</div>
+
+<!-- 결과 -->
+<div class="scrim" id="sheetResult" aria-hidden="true">
+  <div class="card result" role="dialog" aria-label="완성된 작품">
+    <button class="close" data-close aria-label="닫기"><svg class="i"><use href="#ic-x"/></svg></button>
+    <p class="eyebrow">TAMAM</p>
+    <h2>종이에 무늬가 옮겨졌어요</h2>
+    <p>세상에 단 한 장뿐인 나의 에브루입니다.</p>
+    <div class="frame"><img id="printImg" alt="완성된 에브루 작품"></div>
+    <div class="rbtns">
+      <button class="abtn" data-close>계속 작업하기</button>
+      <a class="abtn" id="dl" download="ebru.png"><svg class="i"><use href="#ic-download"/></svg> 저장</a>
+      <button class="abtn primary" id="btnNew">새 물판</button>
+    </div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ic-drop" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></symbol>
+  <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol>
+  <symbol id="ic-pen" viewBox="0 0 24 24"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></symbol>
+  <symbol id="ic-comb" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="4.5" rx="1.5"/><path d="M5 8.5v11"/><path d="M8.5 8.5v11"/><path d="M12 8.5v11"/><path d="M15.5 8.5v11"/><path d="M19 8.5v11"/></symbol>
+  <symbol id="ic-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="ic-eraser" viewBox="0 0 24 24"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21"/><path d="m5.082 11.09 8.828 8.828"/></symbol>
+  <symbol id="ic-wand" viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="ic-palette" viewBox="0 0 24 24"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+</svg>
+
+<script>
+(() => {
+"use strict";
+/* =========================================================
+   물판 엔진 (원본 시뮬레이션 그대로)
+   ========================================================= */
+let W = 1200, H = 800;
+const MAX_SEG2 = 16, MIN_SEG2 = 0.25, MAX_PTS = 9000, HIST = 25;
+
+class Tray {
+  constructor(){ this.drops=[]; this.background="#efe6d2"; this.dirty=true; this.growing=[]; this.tasks=[]; this.history=[]; this.dir=null; }
+  get busy(){ return this.tasks.length>0 || this.growing.length>0; }
+  get canUndo(){ return this.history.length>0; }
+  get isEmpty(){ return this.drops.length===0; }
+  checkpoint(){
+    this.history.push({background:this.background, drops:this.drops.map(d=>({color:d.color, pts:d.pts.slice()}))});
+    if(this.history.length>HIST) this.history.shift();
+  }
+  rotate(){ // 90° 회전: 화면 방향이 바뀌면 물판도 같이 돌려요
+    const oh=H, rot=pts=>{ for(let i=0;i<pts.length;i+=2){ const x=pts[i], y=pts[i+1]; pts[i]=oh-y; pts[i+1]=x; } };
+    for(const d of this.drops) rot(d.pts);
+    for(const s of this.history) for(const d of s.drops) rot(d.pts);
+    for(const g of this.growing){ const x=g.cx; g.cx=oh-g.cy; g.cy=x; }
+    this.tasks=[]; [W,H]=[H,W]; this.dirty=true;
+  }
+  undo(){ const s=this.history.pop(); if(!s) return; this.growing=[]; this.tasks=[]; this.background=s.background; this.drops=s.drops; this.dirty=true; }
+  clear(){ this.checkpoint(); this.drops=[]; this.growing=[]; this.tasks=[]; this.dirty=true; }
+  setBackground(c){ this.background=c; this.dirty=true; }
+  addDrop(x,y,color,r,holding=false){
+    const pts=[];
+    for(let i=0;i<24;i++){ const a=i/24*Math.PI*2; pts.push(x+Math.cos(a)*1.5, y+Math.sin(a)*1.5); }
+    this.drops.push({color, pts});
+    const g={cx:x, cy:y, remaining:r*r-2.25, added:0, max:r*r*5, holdRate:r*r*.04, holding};
+    this.growing.push(g); this.dirty=true;
+  }
+  releaseAll(){ for(const g of this.growing) g.holding=false; }
+  sprinkle(x,y,color,r){
+    const n=6+Math.floor(Math.random()*5);
+    for(let i=0;i<n;i++){
+      const a=Math.random()*Math.PI*2, d=Math.sqrt(Math.random())*r*2.4, rr=r*(.12+Math.random()*.3);
+      this.addDrop(x+Math.cos(a)*d, y+Math.sin(a)*d, color, rr);
+    }
+  }
+  radial(cx,cy,a){
+    for(const d of this.drops){ const p=d.pts;
+      for(let i=0;i<p.length;i+=2){ const dx=p[i]-cx, dy=p[i+1]-cy, d2=dx*dx+dy*dy; if(d2<1e-9) continue;
+        const f=Math.sqrt(1+a/d2); p[i]=cx+dx*f; p[i+1]=cy+dy*f; } }
+  }
+  beginStroke(){ this.dir=null; }
+  pull(x0,y0,x1,y1,tool,size){
+    const dx=x1-x0, dy=y1-y0, len=Math.hypot(dx,dy); if(len<.01) return;
+    const ux=dx/len, uy=dy/len;
+    if(!this.dir) this.dir={x:ux,y:uy};
+    else { const fx=this.dir.x*.75+ux*.25, fy=this.dir.y*.75+uy*.25, n=Math.hypot(fx,fy)||1; this.dir={x:fx/n,y:fy/n}; }
+    const comb=tool==="comb", fall=comb?4+size*.08:5+size*.15, spacing=Math.max(14,size*.9), offs=[];
+    if(comb){ const nx=-this.dir.y, ny=this.dir.x; for(let k=-3;k<=3;k++) offs.push(nx*k*spacing, ny*k*spacing); }
+    else offs.push(0,0);
+    const reach=(comb?3*spacing:0)+fall*7, steps=Math.ceil(len/2.5), sx=dx/steps, sy=dy/steps;
+    for(let s=1;s<=steps;s++){
+      const cx=x0+sx*s, cy=y0+sy*s;
+      for(const d of this.drops){ const p=d.pts;
+        for(let i=0;i<p.length;i+=2){ const px=p[i], py=p[i+1];
+          if(Math.abs(px-cx)>reach || Math.abs(py-cy)>reach) continue;
+          let w=0; for(let k=0;k<offs.length;k+=2) w+=Math.exp(-Math.hypot(px-cx-offs[k], py-cy-offs[k+1])/fall);
+          if(w>.85) w=.85; p[i]=px+sx*w; p[i+1]=py+sy*w; } }
+    }
+    this.resample(); this.dirty=true;
+  }
+  runPreset(id,colors){
+    switch(id){
+      case "battal": this.tasks.push(taskBattal(colors)); break;
+      case "gelgit": this.tasks.push(taskTine(0,1,60,true,150,14,45)); this.tasks.push(taskTine(1,0,60,true,150,14,45)); break;
+      case "tarakli": this.tasks.push(taskTine(0,1,70,true,160,16,45)); this.tasks.push(taskTine(1,0,70,true,160,16,45)); this.tasks.push(taskTine(0,1,18,false,70,5,40)); break;
+      case "sal": this.tasks.push(taskTine(1,0,50,true,140,13,40)); this.tasks.push(taskWave(0,26,90,45)); this.tasks.push(taskTine(0,1,22,false,60,5,35)); break;
+      case "bulbul": this.tasks.push(taskSwirl(W>H?9:6,W>H?6:9,Math.PI*3.2,60)); break;
+    }
+  }
+  forEachPoint(fn){ for(const d of this.drops){ const p=d.pts; for(let i=0;i<p.length;i+=2) fn(p,i); } }
+  hasGrowing(){ return this.growing.length>0; }
+  tick(){
+    let changed=false;
+    if(this.tasks.length){ if(this.tasks[0](this)) this.tasks.shift(); changed=true; }
+    if(this.growing.length){
+      for(const g of this.growing){
+        if(g.holding && g.added+g.remaining<g.max) g.remaining+=g.holdRate;
+        const a=Math.min(g.remaining, Math.max(g.remaining*.2,2));
+        if(a>0) this.radial(g.cx,g.cy,a);
+        g.remaining-=a; g.added+=a;
+      }
+      this.growing=this.growing.filter(g=>g.remaining>.5||g.holding);
+      changed=true;
+    }
+    if(changed){ this.resample(); this.dirty=true; }
+    return changed;
+  }
+  resample(){
+    const keep=[];
+    for(const d of this.drops){
+      const p=d.pts, n=p.length/2; let minx=Infinity,miny=Infinity,maxx=-Infinity,maxy=-Infinity;
+      for(let i=0;i<p.length;i+=2){ const x=p[i], y=p[i+1]; if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; }
+      if(maxx<-60||minx>W+60||maxy<-60||miny>H+60) continue;
+      const out=[p[0],p[1]]; let lx=p[0], ly=p[1];
+      for(let k=1;k<=n;k++){
+        const j=(k%n)*2, x=p[j], y=p[j+1], ddx=x-lx, ddy=y-ly, d2=ddx*ddx+ddy*ddy;
+        if(d2<MIN_SEG2) continue;
+        if(d2>MAX_SEG2 && out.length<MAX_PTS*2){ const m=Math.ceil(Math.sqrt(d2/MAX_SEG2)); for(let t=1;t<m;t++) out.push(lx+ddx*t/m, ly+ddy*t/m); }
+        if(k<n) out.push(x,y);
+        lx=x; ly=y;
+      }
+      if(out.length<6) continue;
+      d.pts=out; keep.push(d);
+    }
+    this.drops=keep;
+  }
+  render(ctx,scale){
+    ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.fillStyle=this.background; ctx.fillRect(0,0,W,H);
+    ctx.lineJoin="round"; ctx.lineWidth=.9; ctx.strokeStyle="rgba(30,20,10,.13)";
+    for(const d of this.drops){ const p=d.pts; ctx.beginPath(); ctx.moveTo(p[0],p[1]);
+      for(let i=2;i<p.length;i+=2) ctx.lineTo(p[i],p[i+1]);
+      ctx.closePath(); ctx.fillStyle=d.color; ctx.fill(); ctx.stroke(); }
+    this.dirty=false;
+  }
+  toPrint(scale=2){
+    const c=document.createElement("canvas"); c.width=W*scale; c.height=H*scale;
+    const ctx=c.getContext("2d"); this.render(ctx,scale); this.dirty=true;
+    ctx.setTransform(1,0,0,1,0,0);
+    const t=document.createElement("canvas"); t.width=t.height=256;
+    const tc=t.getContext("2d"), img=tc.createImageData(256,256);
+    for(let i=0;i<img.data.length;i+=4){ const v=200+Math.random()*55; img.data[i]=v; img.data[i+1]=v-6; img.data[i+2]=v-18; img.data[i+3]=255; }
+    tc.putImageData(img,0,0);
+    ctx.globalCompositeOperation="multiply"; ctx.globalAlpha=.18; ctx.fillStyle=ctx.createPattern(t,"repeat"); ctx.fillRect(0,0,c.width,c.height); ctx.globalAlpha=1;
+    const g=ctx.createRadialGradient(c.width/2,c.height/2,c.height*.3,c.width/2,c.height/2,c.width*.65);
+    g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(70,45,20,.18)");
+    ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height); ctx.globalCompositeOperation="source-over";
+    return c;
+  }
+}
+function taskBattal(colors){
+  const q=[]; for(const c of colors) for(let i=0;i<24;i++) q.push({x:30+Math.random()*(W-60), y:30+Math.random()*(H-60), r:18+Math.random()*30, c});
+  return t=>{ for(let i=0;i<2&&q.length;i++){ const d=q.shift(); t.addDrop(d.x,d.y,d.c,d.r); } return q.length===0 && !t.hasGrowing(); };
+}
+function taskTine(ax,ay,spacing,alt,amount,fall,frames){
+  const nx=-ay, ny=ax, half=spacing/2; let f=0;
+  return t=>{
+    const ease=v=>.5-Math.cos(Math.PI*v)/2, step=amount*(ease((f+1)/frames)-ease(f/frames));
+    t.forEachPoint((p,i)=>{
+      const proj=p[i]*nx+p[i+1]*ny, k0=Math.round((proj-half)/spacing); let w=0;
+      for(let k=k0-1;k<=k0+1;k++){ const dist=Math.abs(proj-(half+k*spacing)), sgn=alt&&((k%2+2)%2===1)?-1:1; w+=sgn*Math.exp(-dist/fall); }
+      p[i]+=ax*step*w; p[i+1]+=ay*step*w;
+    });
+    return ++f>=frames;
+  };
+}
+function taskWave(_,amp,period,frames){
+  let f=0; return t=>{ const s=amp/frames; t.forEachPoint((p,i)=>{ p[i]+=s*Math.sin(p[i+1]/period*Math.PI*2); }); return ++f>=frames; };
+}
+function taskSwirl(cols,rows,angle,frames){
+  const cw=W/cols, ch=H/rows, rad=Math.min(cw,ch)/2; let f=0;
+  return t=>{ const da=angle/frames;
+    t.forEachPoint((p,i)=>{ const c=Math.floor(p[i]/cw), r=Math.floor(p[i+1]/ch);
+      if(c<0||r<0||c>=cols||r>=rows) return;
+      const cx=(c+.5)*cw, cy=(r+.5)*ch, dx=p[i]-cx, dy=p[i+1]-cy, d=Math.hypot(dx,dy); if(d>=rad) return;
+      const k=1-d/rad, a=da*k*k*((c+r)%2?1:-1), co=Math.cos(a), si=Math.sin(a);
+      p[i]=cx+dx*co-dy*si; p[i+1]=cy+dx*si+dy*co; });
+    return ++f>=frames; };
+}
+
+/* =========================================================
+   데이터
+   ========================================================= */
+const PIGMENTS=[["#233a6b","쪽빛","Çivit"],["#a8322d","꼭두서니","Kök boya"],["#c58b3a","황토","Aşı boyası"],["#e2b33c","사프란","Safran"],["#2f8f8a","터키석","Turkuaz"],["#d27a86","장미","Gül"],["#4e7a3e","올리브","Yeşil"],["#5d3b6e","자주","Mor"],["#7fa7c9","하늘","Gök"],["#b5562f","테라코타","Kiremit"],["#1d1b1b","먹","İs mürekkebi"],["#f4efe4","백토","Üstübeç"]];
+const GROUNDS=[["#efe6d2","크림"],["#d5e2e4","연청"],["#f0dbd3","연분홍"],["#e9d9a8","연황"],["#1f2f52","감청"],["#232020","먹색"]];
+const PALETTES=[["#233a6b","#c58b3a","#a8322d","#f4efe4"],["#2f8f8a","#e2b33c","#1d1b1b","#f4efe4"],["#5d3b6e","#d27a86","#7fa7c9","#f4efe4"],["#a8322d","#233a6b","#e2b33c","#4e7a3e"],["#b5562f","#2f8f8a","#efe6d2","#233a6b"]];
+const TOOLS=[
+  {id:"drop",ko:"떨구기",tr:"Damla",hint:"누르고 있으면 방울이 더 커져요",icon:"ic-drop"},
+  {id:"sprinkle",ko:"흩뿌리기",tr:"Serpme",hint:"붓을 털듯 작은 방울을 흩뿌려요",icon:"ic-sparkle"},
+  {id:"stylus",ko:"송곳",tr:"Biz",hint:"끌어당겨 물감에 선을 그려요",icon:"ic-pen"},
+  {id:"comb",ko:"빗",tr:"Tarak",hint:"여러 갈래로 물감을 빗질해요",icon:"ic-comb"}];
+const PRESETS=[
+  {id:"battal",ko:"바탈",tr:"Battal",desc:"여러 색을 판 전체에 흩뿌린 바탕 무늬"},
+  {id:"gelgit",ko:"겔기트",tr:"Gel-git",desc:"송곳으로 오가며 그은 물결 무늬"},
+  {id:"tarakli",ko:"타라클르",tr:"Taraklı",desc:"겔기트 위에 촘촘한 빗질"},
+  {id:"sal",ko:"샬",tr:"Şal",desc:"물결 빗질로 만든 숄 무늬"},
+  {id:"bulbul",ko:"뷸뷸 유바스",tr:"Bülbül yuvası",desc:"소용돌이치는 나이팅게일 둥지"}];
+const STEPS=[["01","물판 준비","Tekne","해초에서 얻은 끈적한 물(케레)을 나무 물판에 채워 물감이 떠 있게 해요."],["02","물감 떨구기","Boya serpme","소 담즙을 섞은 천연 물감을 말총 붓으로 떨구거나 털어 흩뿌려요."],["03","무늬 그리기","Desen","송곳과 빗으로 물감을 끌어당겨 물결, 깃털, 꽃 무늬를 만들어요."],["04","종이에 찍기","Kâğıda alma","종이를 살며시 덮었다 들어 올리면 무늬가 옮겨져요. 같은 무늬는 다시 나오지 않아요."]];
+const DICT=[["바탈","Battal","여러 색을 판 가득 흩뿌린 가장 기본 에브루. 모든 무늬의 바탕이 돼요."],["겔기트","Gel-git","“가고 오다”. 송곳을 위아래·좌우로 오가며 물결을 만들어요."],["타라클르","Taraklı","겔기트 위로 촘촘한 빗을 지나가게 해 깃털 무늬를 얻어요."],["샬","Şal","빗을 물결치듯 움직여 페르시아 숄 문양을 닮은 무늬를 만들어요."],["뷸뷸 유바스","Bülbül yuvası","“나이팅게일의 둥지”. 작은 소용돌이를 반복해 그려요."]];
+
+/* =========================================================
+   UI
+   ========================================================= */
+const $=id=>document.getElementById(id);
+const tray=new Tray();
+const cv=$("cv"), ctx=cv.getContext("2d");
+const ov=$("ov"), octx=ov.getContext("2d");
+const S={tool:"drop", color:PIGMENTS[0][0], ground:GROUNDS[0][0], size:34, phase:"idle", busy:false};
+let scale=1, ptr=null;
+
+// 화면 높이 보정 (모바일 주소창 대응)
+const setAppH=()=>document.documentElement.style.setProperty("--app-h",(window.visualViewport?visualViewport.height:innerHeight)+"px");
+setAppH(); addEventListener("resize",setAppH); window.visualViewport&&visualViewport.addEventListener("resize",setAppH);
+
+// 물판을 남은 공간에 3:2로 꽉 맞추기
+const stage=$("stage"), trayEl=$("tray");
+function fit(){
+  const r=stage.getBoundingClientRect(), pad=parseFloat(getComputedStyle(trayEl).paddingLeft)||0;
+  const aw=Math.max(40,r.width-pad*2), ah=Math.max(30,r.height-pad*2);
+  const area=(rw,rh)=>{ let w=aw, h=w*rh/rw; if(h>ah){ h=ah; w=h*rw/rh; } return [w,h,w*h]; };
+  const L=area(1200,800), P=area(800,1200), portrait=H>W;
+  if(!portrait && P[2]>L[2]*1.12) tray.rotate(); else if(portrait && L[2]>P[2]*1.12) tray.rotate();
+  let [w,h]=H>W?P:L;
+  trayEl.style.width=(w+pad*2)+"px"; trayEl.style.height=(h+pad*2)+"px";
+  const dpr=Math.min(devicePixelRatio||1,2);
+  cv.width=ov.width=Math.round(w*dpr); cv.height=ov.height=Math.round(h*dpr); scale=cv.width/W; tray.dirty=true;
+}
+new ResizeObserver(fit).observe(stage); fit();
+
+// 도구
+const toolset=$("toolset");
+TOOLS.forEach((t,i)=>{
+  const b=document.createElement("button"); b.className="tool"; b.dataset.id=t.id; b.setAttribute("role","radio");
+  b.title=`${t.ko} · ${t.hint} (${i+1})`; b.setAttribute("aria-label",t.ko);
+  b.innerHTML=`<svg class="i"><use href="#${t.icon}"/></svg><small>${t.ko}</small>`;
+  b.onclick=()=>setTool(t.id); toolset.appendChild(b);
+});
+function setTool(id){
+  S.tool=id;
+  toolset.querySelectorAll(".tool").forEach(b=>{const on=b.dataset.id===id; b.classList.toggle("on",on); b.setAttribute("aria-checked",on);});
+  const pull=id==="stylus"||id==="comb";
+  cv.classList.toggle("pull", pull);
+  $("sizeLabel").textContent=id==="comb"?"빗 간격":id==="stylus"?"송곳 굵기":"방울 크기";
+  if(pull) flashPreview();
+  updateStatus();
+}
+// 크기
+const sizeIn=$("size"), sizeOut=$("sizeOut");
+sizeIn.oninput=()=>{S.size=+sizeIn.value; sizeOut.textContent=S.size; if(S.tool==="comb"||S.tool==="stylus") flashPreview();};
+
+// 송곳·빗 미리보기: 고르는 순간·크기를 바꿀 때 물판 가운데에 잠깐, 마우스면 커서를 따라다녀요
+const PV={x:0,y:0,until:0,hover:false};
+function flashPreview(){ if(!PV.hover){ PV.x=W/2; PV.y=H/2; } PV.until=performance.now()+1600; }
+function drawOverlay(){
+  octx.setTransform(1,0,0,1,0,0); octx.clearRect(0,0,ov.width,ov.height);
+  const t=S.tool; if((t!=="comb"&&t!=="stylus")||S.phase!=="idle") return;
+  const now=performance.now(), live=ptr||PV.hover;
+  if(!live && now>PV.until) return;
+  const a=live?1:Math.min(1,(PV.until-now)/450);
+  const x=ptr?ptr.x:PV.x, y=ptr?ptr.y:PV.y;
+  const d=(ptr&&tray.dir)?tray.dir:{x:1,y:0}, nx=-d.y, ny=d.x;
+  octx.setTransform(scale,0,0,scale,0,0); octx.globalAlpha=a;
+  const pin=(px,py,fall)=>{
+    octx.beginPath(); octx.arc(px,py,fall*1.6,0,Math.PI*2);
+    octx.fillStyle="rgba(255,255,255,.4)"; octx.fill();
+    octx.setLineDash([4,4]); octx.lineWidth=2; octx.strokeStyle="rgba(29,42,68,.6)"; octx.stroke(); octx.setLineDash([]);
+    octx.beginPath(); octx.arc(px,py,5,0,Math.PI*2); octx.fillStyle="#1d2a44"; octx.fill();
+  };
+  if(t==="comb"){
+    const sp=Math.max(14,S.size*.9), fall=4+S.size*.08, L=3.55*sp;
+    octx.lineCap="round"; octx.lineWidth=14; octx.strokeStyle="rgba(122,82,50,.7)";
+    octx.beginPath(); octx.moveTo(x-nx*L,y-ny*L); octx.lineTo(x+nx*L,y+ny*L); octx.stroke();
+    for(let k=-3;k<=3;k++) pin(x+nx*k*sp, y+ny*k*sp, fall);
+  } else {
+    pin(x,y,5+S.size*.15);
+  }
+  octx.globalAlpha=1;
+}
+// 물감
+const colorsEl=$("colors");
+PIGMENTS.forEach(([hex,ko,tr])=>{
+  const b=document.createElement("button"); b.className="pig"; b.style.background=hex; b.dataset.hex=hex;
+  b.title=`${ko} · ${tr}`; b.setAttribute("aria-label",ko); b.setAttribute("role","radio");
+  b.onclick=()=>{ setColor(hex); pickDropTool(); }; colorsEl.appendChild(b);
+});
+function setColor(hex){
+  S.color=hex;
+  colorsEl.querySelectorAll(".pig").forEach(b=>{const on=b.dataset.hex===hex; b.classList.toggle("on",on); b.setAttribute("aria-checked",on);});
+  document.documentElement.style.setProperty("--cur",hex); updateStatus();
+}
+// 송곳·빗 상태에서 색을 고르면 '떨구기'로 자동 전환 (떨구기·흩뿌리기는 그대로 유지)
+function pickDropTool(){
+  if(S.tool!=="stylus" && S.tool!=="comb") return;
+  setTool("drop");
+  const btn=toolset.querySelector('[data-id="drop"]');
+  btn.animate([{transform:"scale(1)"},{transform:"scale(1.12)"},{transform:"scale(1)"}],{duration:360,easing:"ease-out"});
+}
+// 상태줄
+function updateStatus(){
+  const t=TOOLS.find(x=>x.id===S.tool), p=PIGMENTS.find(x=>x[0]===S.color);
+  $("status").innerHTML=`<b>${t.ko}</b> · ${t.hint} <span style="opacity:.7">· ${p[1]}</span>`;
+}
+function syncUI(){
+  $("btnUndo").disabled=!tray.canUndo;
+  $("hint").classList.toggle("off", !tray.isEmpty || tray.busy || S.phase!=="idle");
+  $("btnPrint").disabled=S.phase!=="idle";
+}
+
+// 시트
+function openSheet(id){ const s=$(id); s.classList.add("open"); s.setAttribute("aria-hidden","false"); }
+function closeSheet(id){ const s=$(id); s.classList.remove("open"); s.setAttribute("aria-hidden","true"); }
+document.querySelectorAll(".scrim").forEach(s=>{
+  s.addEventListener("click",e=>{ if(e.target===s || e.target.closest("[data-close]")) { if(s.id==="sheetResult") endPrint(false); else closeSheet(s.id); } });
+});
+$("btnMore").onclick=()=>openSheet("sheetMore");
+$("btnAbout").onclick=()=>openSheet("sheetAbout");
+
+// 기법
+const presetsEl=$("presets");
+PRESETS.forEach(p=>{
+  const b=document.createElement("button"); b.className="pat"; b.title=`${p.ko} · ${p.desc}`;
+  b.innerHTML=`<b>${p.ko}</b><i>${p.tr}</i>`;
+  b.onclick=()=>{ if(S.phase!=="idle") return; applyPreset(p.id);
+    b.classList.add("flash"); setTimeout(()=>b.classList.remove("flash"),450); };
+  presetsEl.appendChild(b);
+});
+function applyPreset(id){
+  tray.checkpoint();
+  const pal=PALETTES[Math.floor(Math.random()*PALETTES.length)];
+  const cols=[S.color,...pal.filter(c=>c!==S.color&&c!==S.ground)].slice(0,4);
+  tray.runPreset(id,cols); syncUI();
+}
+// 바탕
+const bgsEl=$("bgs");
+GROUNDS.forEach(([hex,ko])=>{
+  const b=document.createElement("button"); b.className="bg"; b.dataset.hex=hex;
+  b.innerHTML=`<i style="background:${hex}"></i>${ko}`;
+  b.onclick=()=>{ tray.checkpoint(); setGround(hex); syncUI(); }; bgsEl.appendChild(b);
+});
+function setGround(hex){ S.ground=hex; tray.setBackground(hex); bgsEl.querySelectorAll(".bg").forEach(b=>b.classList.toggle("on",b.dataset.hex===hex)); }
+
+// 장인 시연
+function demo(){
+  closeSheet("sheetMore");
+  tray.checkpoint(); tray.drops=[]; tray.growing=[]; tray.tasks=[]; tray.dirty=true;
+  const pal=PALETTES[Math.floor(Math.random()*PALETTES.length)].filter(c=>c!==S.ground);
+  tray.runPreset("battal",pal); tray.runPreset(Math.random()<.5?"tarakli":"sal",[]); syncUI();
+}
+$("btnDemo").onclick=demo;
+document.querySelector("[data-demo]").onclick=demo;
+
+// 소개 탭
+$("steps").innerHTML=STEPS.map(([n,ko,tr,t])=>`<li><b>${n}</b><strong>${ko}</strong> <em style="font-size:11px;color:var(--ink-45)">${tr}</em><p>${t}</p></li>`).join("");
+$("dict").innerHTML=DICT.map(([ko,tr,t])=>`<div><strong>${ko}</strong><em>${tr}</em><p>${t}</p></div>`).join("");
+$("aboutTabs").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  $("aboutTabs").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll("#sheetAbout [data-panel]").forEach(p=>p.hidden=p.dataset.panel!==b.dataset.tab);
+});
+
+// 되돌리기 / 비우기
+function undo(){ tray.undo(); setGround(tray.background); syncUI(); }
+$("btnUndo").onclick=undo;
+$("btnClear").onclick=()=>{ if(tray.isEmpty&&!tray.busy) return; tray.clear(); syncUI(); };
+
+// 종이에 찍기
+function print(){
+  if(S.phase!=="idle") return;
+  if(tray.isEmpty){ const h=$("hint"); h.classList.remove("off"); h.animate([{transform:"scale(1)"},{transform:"scale(1.06)"},{transform:"scale(1)"}],{duration:400}); return; }
+  S.phase="lowering"; syncUI();
+  const slot=$("paperSlot"); slot.innerHTML='<div class="paper-sheet"><span>Kâğıt</span></div>';
+  setTimeout(()=>{
+    const url=tray.toPrint(2).toDataURL("image/png");
+    $("printImg").src=url; $("dl").href=url; $("dl").download=`ebru-${Date.now()}.png`;
+    slot.firstChild.classList.add("lift"); S.phase="lifting";
+    setTimeout(()=>{ slot.innerHTML=""; S.phase="result"; openSheet("sheetResult"); },750);
+  },1100);
+}
+function endPrint(fresh){ if(fresh){ tray.clear(); } closeSheet("sheetResult"); S.phase="idle"; syncUI(); }
+$("btnPrint").onclick=print;
+$("btnNew").onclick=()=>endPrint(true);
+
+// 포인터
+function pos(e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*W/r.width, y:(e.clientY-r.top)*H/r.height}; }
+cv.addEventListener("pointerdown",e=>{
+  if(S.phase!=="idle") return;
+  cv.setPointerCapture(e.pointerId); const {x,y}=pos(e);
+  tray.checkpoint(); ptr={x,y,last:performance.now()};
+  if(S.tool==="drop") tray.addDrop(x,y,S.color,S.size,true);
+  else if(S.tool==="sprinkle") tray.sprinkle(x,y,S.color,S.size);
+  else tray.beginStroke();
+  syncUI();
+});
+cv.addEventListener("pointermove",e=>{
+  if(e.pointerType==="mouse"){ const q=pos(e); PV.hover=true; PV.x=q.x; PV.y=q.y; }
+  if(!ptr) return; const {x,y}=pos(e);
+  if(S.tool==="stylus"||S.tool==="comb"){ tray.pull(ptr.x,ptr.y,x,y,S.tool,S.size); ptr.x=x; ptr.y=y; }
+  else if(S.tool==="sprinkle"){ const now=performance.now(); if(now-ptr.last>70){ tray.sprinkle(x,y,S.color,S.size); ptr.last=now; } }
+});
+const up=()=>{ ptr=null; tray.releaseAll(); };
+cv.addEventListener("pointerleave",()=>{ PV.hover=false; PV.until=0; });
+cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
+cv.addEventListener("contextmenu",e=>e.preventDefault());
+
+// 키보드
+addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT") return;
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); undo(); return; }
+  if(e.key==="Escape"){ ["sheetMore","sheetAbout"].forEach(closeSheet); if(S.phase==="result") endPrint(false); return; }
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(["1","2","3","4"].includes(e.key)) setTool(TOOLS[+e.key-1].id);
+  else if(e.key.toLowerCase()==="p") print();
+});
+
+// 렌더 루프
+function loop(){
+  tray.tick();
+  if(tray.dirty) tray.render(ctx,scale);
+  drawOverlay();
+  const b=tray.busy; if(b!==S.busy){ S.busy=b; $("spread").classList.toggle("on",b); syncUI(); }
+  requestAnimationFrame(loop);
+}
+setTool("drop"); setColor(S.color); setGround(S.ground); syncUI();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
