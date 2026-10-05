@@ -51,6 +51,21 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 .chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid var(--ink-10);background:rgba(255,255,255,.55);transition:background .15s,border-color .15s}
 .chip:hover{background:#fff;border-color:rgba(168,50,45,.4)}
 .chip.icon{width:36px;padding:0;justify-content:center}
+.chip{position:relative}
+.badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--madder);color:#fff;font-size:10.5px;font-weight:600;display:grid;place-items:center;line-height:1}
+.badge[hidden]{display:none}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:14px}
+.gal button{aspect-ratio:1;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .15s}
+.gal button:hover{transform:translateY(-2px)}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.empty{margin-top:18px;padding:22px;border:1px dashed rgba(29,42,68,.25);border-radius:12px;text-align:center;font-size:14px;color:var(--ink-60)}
+.inapp{position:fixed;left:8px;right:8px;top:max(8px,env(safe-area-inset-top));z-index:40;display:flex;align-items:center;gap:8px;padding:10px 10px 10px 14px;border-radius:14px;background:var(--ink);color:var(--paper);box-shadow:0 10px 30px -8px rgba(0,0,0,.45);font-size:13px;line-height:1.4;animation:card-in .3s both}
+.inapp[hidden]{display:none}
+.inapp .msg{flex:1;min-width:0}
+.inapp .msg b{display:block;font-size:14px}
+.inapp .go{flex:none;height:38px;padding:0 12px;border-radius:10px;background:var(--madder);color:#fff;font-weight:600;font-size:13px}
+.inapp .x{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:rgba(244,236,220,.7)}
+.inapp .copy{color:#f1d9a4;text-decoration:underline;font-size:12.5px;padding:0;margin-top:2px}
 
 main{
   min-height:0;display:grid;gap:var(--gap);
@@ -125,6 +140,7 @@ canvas.pull{cursor:crosshair}
 .abtn.primary{background:var(--madder);border-color:var(--madder);color:#fff;padding:0 18px;font-weight:600}
 .abtn.primary:hover:not(:disabled){background:#922a26}
 .abtn .t{display:inline}
+[hidden]{display:none!important}
 
 /* ---------- 세로(모바일) 미세조정 ---------- */
 @media (max-width:599px), (max-aspect-ratio:5/4){
@@ -217,7 +233,10 @@ canvas.pull{cursor:crosshair}
 .dict p{font-size:13px;margin-top:2px}
 .keys{font-size:12px;color:var(--ink-60);margin-top:14px;line-height:1.6}
 kbd{font-family:var(--sans);font-size:11px;border:1px solid var(--ink-10);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:#fff}
-.result img{display:block;width:100%;max-height:min(48vh,48dvh);object-fit:contain;border-radius:4px;box-shadow:0 6px 20px -8px rgba(0,0,0,.4);background:#f8f2e4}
+.savehint{margin-top:10px;font-size:13px;color:var(--ink-60);text-align:center;line-height:1.5}
+.savehint.loud{color:#fff;background:var(--madder);border-radius:10px;padding:8px 10px;animation:card-in .3s both}
+@keyframes card-in{0%{opacity:0;transform:translateY(6px)}}
+.result img{-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto;display:block;width:100%;max-height:min(48vh,48dvh);object-fit:contain;border-radius:4px;box-shadow:0 6px 20px -8px rgba(0,0,0,.4);background:#f8f2e4}
 .frame{margin-top:14px;padding:10px;background:#fff;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .rbtns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}
 .rbtns .abtn{text-decoration:none;color:inherit}
@@ -235,6 +254,7 @@ kbd{font-family:var(--sans);font-size:11px;border:1px solid var(--ink-10);border
     </div>
     <div class="hbtns">
       <button class="chip" id="btnDemo" title="장인이 바탕부터 무늬까지 시연해요"><svg class="i"><use href="#ic-wand"/></svg><span class="t">장인 시연</span></button>
+      <button class="chip icon" id="btnGallery" title="내 작품" aria-label="내 작품"><svg class="i"><use href="#ic-images"/></svg><span class="badge" id="galCount" hidden>0</span></button>
       <button class="chip icon" id="btnAbout" title="에브루란?" aria-label="에브루란?"><svg class="i"><use href="#ic-info"/></svg></button>
     </div>
   </header>
@@ -309,17 +329,38 @@ kbd{font-family:var(--sans);font-size:11px;border:1px solid var(--ink-10);border
   </div>
 </div>
 
+<!-- 내 작품 -->
+<div class="scrim" id="sheetGallery" aria-hidden="true">
+  <div class="card" role="dialog" aria-label="내 작품">
+    <button class="close" data-close aria-label="닫기"><svg class="i"><use href="#ic-x"/></svg></button>
+    <p class="eyebrow">ESERLERİM</p>
+    <h2>내 작품</h2>
+    <p>종이에 찍은 작품이 이 기기에 자동으로 모여요. 눌러서 크게 보고 저장할 수 있어요. (최근 40장)</p>
+    <div class="gal" id="gal"></div>
+    <div class="empty" id="galEmpty">아직 찍은 작품이 없어요.<br>무늬를 만들고 ‘종이에 찍기’를 눌러 보세요.</div>
+  </div>
+</div>
+
+<!-- 앱 안 브라우저 안내 -->
+<div class="inapp" id="inapp" hidden role="alert">
+  <div class="msg"><b>앱 안에서 열렸어요</b><span id="inappMsg">크롬이나 사파리로 열면 저장까지 잘 돼요.</span><br><button class="copy" id="inappCopy">주소 복사하기</button></div>
+  <button class="go" id="inappGo">브라우저로 열기</button>
+  <button class="x" id="inappX" aria-label="닫기"><svg class="i"><use href="#ic-x"/></svg></button>
+</div>
+
 <!-- 결과 -->
 <div class="scrim" id="sheetResult" aria-hidden="true">
   <div class="card result" role="dialog" aria-label="완성된 작품">
     <button class="close" data-close aria-label="닫기"><svg class="i"><use href="#ic-x"/></svg></button>
-    <p class="eyebrow">TAMAM</p>
-    <h2>종이에 무늬가 옮겨졌어요</h2>
-    <p>세상에 단 한 장뿐인 나의 에브루입니다.</p>
+    <p class="eyebrow" id="resEyebrow">TAMAM</p>
+    <h2 id="resTitle">종이에 무늬가 옮겨졌어요</h2>
+    <p id="resSub">세상에 단 한 장뿐인 나의 에브루입니다. ‘내 작품’에도 담아 두었어요.</p>
     <div class="frame"><img id="printImg" alt="완성된 에브루 작품"></div>
+    <p class="savehint" id="saveHint" hidden></p>
     <div class="rbtns">
-      <button class="abtn" data-close>계속 작업하기</button>
-      <a class="abtn" id="dl" download="ebru.png"><svg class="i"><use href="#ic-download"/></svg> 저장</a>
+      <button class="abtn" data-close id="btnCont">계속 작업하기</button>
+      <button class="abtn" id="btnDel" hidden>지우기</button>
+      <button class="abtn" id="btnSave"><svg class="i"><use href="#ic-download"/></svg> 저장</button>
       <button class="abtn primary" id="btnNew">새 물판</button>
     </div>
   </div>
@@ -333,6 +374,7 @@ kbd{font-family:var(--sans);font-size:11px;border:1px solid var(--ink-10);border
   <symbol id="ic-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
   <symbol id="ic-eraser" viewBox="0 0 24 24"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21"/><path d="m5.082 11.09 8.828 8.828"/></symbol>
   <symbol id="ic-wand" viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></symbol>
+  <symbol id="ic-images" viewBox="0 0 24 24"><path d="M18 22H4a2 2 0 0 1-2-2V6"/><path d="m22 13-1.296-1.296a2.41 2.41 0 0 0-3.408 0L11 18"/><circle cx="12" cy="8" r="2"/><rect width="16" height="16" x="6" y="2" rx="2"/></symbol>
   <symbol id="ic-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   <symbol id="ic-download" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></symbol>
   <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
@@ -639,7 +681,7 @@ function syncUI(){
 function openSheet(id){ const s=$(id); s.classList.add("open"); s.setAttribute("aria-hidden","false"); }
 function closeSheet(id){ const s=$(id); s.classList.remove("open"); s.setAttribute("aria-hidden","true"); }
 document.querySelectorAll(".scrim").forEach(s=>{
-  s.addEventListener("click",e=>{ if(e.target===s || e.target.closest("[data-close]")) { if(s.id==="sheetResult") endPrint(false); else closeSheet(s.id); } });
+  s.addEventListener("click",e=>{ if(e.target===s || e.target.closest("[data-close]")) { if(s.id==="sheetResult") closeResult(); else closeSheet(s.id); } });
 });
 $("btnMore").onclick=()=>openSheet("sheetMore");
 $("btnAbout").onclick=()=>openSheet("sheetAbout");
@@ -699,12 +741,119 @@ function print(){
   S.phase="lowering"; syncUI();
   const slot=$("paperSlot"); slot.innerHTML='<div class="paper-sheet"><span>Kâğıt</span></div>';
   setTimeout(()=>{
-    const url=tray.toPrint(2).toDataURL("image/png");
-    $("printImg").src=url; $("dl").href=url; $("dl").download=`ebru-${Date.now()}.png`;
+    const pc=tray.toPrint(2); S.printBlob=null; S.printName=`ebru-${Date.now()}.png`;
+    $("printImg").src=pc.toDataURL("image/png");
+    const th=document.createElement("canvas"), k=320/Math.max(pc.width,pc.height);
+    th.width=Math.round(pc.width*k); th.height=Math.round(pc.height*k);
+    th.getContext("2d").drawImage(pc,0,0,th.width,th.height);
+    const thumb=th.toDataURL("image/jpeg",.82), id=Date.now();
+    S.view=null; setResultMode(false);
+    pc.toBlob(b=>{ S.printBlob=b; galleryAdd({id, blob:b, thumb}); },"image/png");
+    const h=$("saveHint"); h.classList.remove("loud");
+    h.hidden=!TOUCH; h.textContent="그림을 길게 눌러도 사진에 저장할 수 있어요.";
     slot.firstChild.classList.add("lift"); S.phase="lifting";
     setTimeout(()=>{ slot.innerHTML=""; S.phase="result"; openSheet("sheetResult"); },750);
   },1100);
 }
+// 저장: 휴대폰은 공유 시트(사진에 저장), 컴퓨터는 파일 내려받기
+const UA=navigator.userAgent;
+const IOS=/iPad|iPhone|iPod/.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const INAPP=/FBAN|FBAV|FB_IAB|Instagram|KAKAOTALK|NAVER|Line\/|DaumApps|wv\)/i.test(UA);
+const TOUCH=matchMedia("(pointer:coarse)").matches;
+async function savePrint(){
+  let blob=S.printBlob;
+  if(!blob) blob=await (await fetch($("printImg").src)).blob();
+  const file=new File([blob],S.printName,{type:"image/png"});
+  if(TOUCH && navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:"나의 에브루"}); return; }
+    catch(e){ if(e.name==="AbortError") return; }
+  }
+  if(IOS||INAPP){
+    const h=$("saveHint"); h.hidden=false; h.classList.add("loud");
+    h.innerHTML="위 그림을 <b>길게 누른 뒤 ‘사진에 저장’</b>을 눌러 주세요."+(INAPP?"<br>(앱 안에서 열었다면 ‘다른 브라우저로 열기’를 하면 저장 버튼도 작동해요)":"");
+    $("printImg").animate([{transform:"scale(1)"},{transform:"scale(1.03)"},{transform:"scale(1)"}],{duration:500});
+    return;
+  }
+  const u=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=u; a.download=S.printName; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),5000);
+}
+$("btnSave").onclick=savePrint;
+/* ---------- 내 작품 (이 기기의 IndexedDB에 보관) ---------- */
+const GAL_MAX=40; let MEM=[];
+const idb=(()=>{ let p=null;
+  const open=()=>p||(p=new Promise((res,rej)=>{ try{ const q=indexedDB.open("ebru-atolyesi",1);
+    q.onupgradeneeded=()=>q.result.createObjectStore("prints",{keyPath:"id"});
+    q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }catch(e){ rej(e); } }));
+  const run=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{ const t=db.transaction("prints",mode), rq=fn(t.objectStore("prints"));
+    t.oncomplete=()=>res(rq&&rq.result); t.onerror=()=>rej(t.error); }));
+  return { all:()=>run("readonly",st=>st.getAll()), put:r=>run("readwrite",st=>st.put(r)), del:id=>run("readwrite",st=>st.delete(id)) };
+})();
+async function galleryAll(){ try{ MEM=(await idb.all())||MEM; }catch(e){} return MEM.slice().sort((a,b)=>b.id-a.id); }
+async function galleryAdd(rec){
+  MEM.push(rec);
+  try{ await idb.put(rec); const all=await galleryAll();
+    for(const old of all.slice(GAL_MAX)) await idb.del(old.id);
+  }catch(e){ MEM=MEM.slice(-GAL_MAX); }
+  refreshGalCount();
+}
+async function galleryDel(id){ MEM=MEM.filter(r=>r.id!==id); try{ await idb.del(id); }catch(e){} refreshGalCount(); }
+async function refreshGalCount(){ const n=(await galleryAll()).length; const b=$("galCount"); b.hidden=!n; b.textContent=n>99?"99+":n; }
+async function renderGallery(){
+  const all=await galleryAll(), g=$("gal"); g.innerHTML="";
+  $("galEmpty").hidden=all.length>0;
+  for(const rec of all){ const b=document.createElement("button");
+    const d=new Date(rec.id); b.title=d.toLocaleString("ko-KR");
+    b.innerHTML=`<img alt="${b.title}에 찍은 작품" src="${rec.thumb}">`;
+    b.onclick=()=>viewPrint(rec); g.appendChild(b); }
+}
+$("btnGallery").onclick=async()=>{ await renderGallery(); openSheet("sheetGallery"); };
+function setResultMode(gallery){
+  $("resEyebrow").textContent=gallery?"ESERİM":"TAMAM";
+  $("btnCont").hidden=gallery; $("btnNew").hidden=gallery; $("btnDel").hidden=!gallery;
+  if(!gallery){ $("resTitle").textContent="종이에 무늬가 옮겨졌어요"; $("resSub").textContent="세상에 단 한 장뿐인 나의 에브루입니다. ‘내 작품’에도 담아 두었어요."; }
+}
+let viewURL=null;
+function viewPrint(rec){
+  S.view=rec; S.printBlob=rec.blob; S.printName=`ebru-${rec.id}.png`;
+  if(viewURL) URL.revokeObjectURL(viewURL); viewURL=URL.createObjectURL(rec.blob);
+  $("printImg").src=viewURL; setResultMode(true);
+  $("resTitle").textContent="내 작품";
+  $("resSub").textContent=new Date(rec.id).toLocaleString("ko-KR",{month:"long",day:"numeric",hour:"numeric",minute:"2-digit"})+"에 찍은 에브루";
+  const h=$("saveHint"); h.classList.remove("loud"); h.hidden=!TOUCH; h.textContent="그림을 길게 눌러도 사진에 저장할 수 있어요.";
+  closeSheet("sheetGallery"); openSheet("sheetResult");
+}
+function closeResult(){ if(S.view){ S.view=null; closeSheet("sheetResult"); $("btnGallery").onclick(); } else endPrint(false); }
+$("btnDel").onclick=async()=>{ if(!S.view) return; if(!confirm("이 작품을 지울까요?")) return; await galleryDel(S.view.id); closeResult(); };
+refreshGalCount();
+
+/* ---------- 앱 안 브라우저(카톡·페북·인스타·네이버 등) → 크롬/사파리로 유도 ---------- */
+const ANDROID=/Android/i.test(UA), KAKAO=/KAKAOTALK/i.test(UA), LINE=/\bLine\//i.test(UA);
+function openExternal(){
+  const url=location.href.replace(/[?&]openExternalBrowser=1/,"");
+  if(KAKAO){ location.href="kakaotalk://web/openExternal?url="+encodeURIComponent(url); return; }
+  if(LINE){ location.href=url+(url.includes("?")?"&":"?")+"openExternalBrowser=1"; return; }
+  if(ANDROID){ location.href="intent://"+url.replace(/^https?:\/\//,"")+"#Intent;scheme="+location.protocol.replace(":","")+";package=com.android.chrome;end"; return; }
+  if(IOS){ location.href="x-safari-"+url; }
+}
+if(INAPP && /^https?:/.test(location.protocol)){
+  const box=$("inapp");
+  $("inappMsg").textContent=IOS&&!KAKAO&&!LINE
+    ? "아래 버튼이 안 되면 화면의 ··· 메뉴에서 ‘Safari로 열기’를 눌러 주세요."
+    : "크롬이나 사파리로 열면 저장까지 잘 돼요.";
+  $("inappGo").textContent=IOS?"사파리로 열기":"크롬으로 열기";
+  box.hidden=false;
+  $("inappGo").onclick=openExternal;
+  $("inappX").onclick=()=>{ box.hidden=true; };
+  $("inappCopy").onclick=async()=>{
+    try{ await navigator.clipboard.writeText(location.href); $("inappCopy").textContent="복사됐어요! 사파리·크롬 주소창에 붙여 넣으세요"; }
+    catch(e){ prompt("이 주소를 복사해 사파리·크롬에서 열어 주세요", location.href); }
+  };
+  // 카카오톡·라인·안드로이드는 자동으로 한 번 넘겨 보기 (실패하면 안내 배너가 남아 있어요)
+  let tried=false; try{ tried=sessionStorage.getItem("ebru-ext")==="1"; sessionStorage.setItem("ebru-ext","1"); }catch(e){}
+  if(!tried && (KAKAO||LINE||ANDROID)) setTimeout(openExternal,400);
+}
+
 function endPrint(fresh){ if(fresh){ tray.clear(); } closeSheet("sheetResult"); S.phase="idle"; syncUI(); }
 $("btnPrint").onclick=print;
 $("btnNew").onclick=()=>endPrint(true);
@@ -735,7 +884,7 @@ cv.addEventListener("contextmenu",e=>e.preventDefault());
 addEventListener("keydown",e=>{
   if(e.target.tagName==="INPUT") return;
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="z"){ e.preventDefault(); undo(); return; }
-  if(e.key==="Escape"){ ["sheetMore","sheetAbout"].forEach(closeSheet); if(S.phase==="result") endPrint(false); return; }
+  if(e.key==="Escape"){ ["sheetMore","sheetAbout","sheetGallery"].forEach(closeSheet); if(S.view){ closeResult(); return; } if(S.phase==="result") endPrint(false); return; }
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   if(["1","2","3","4"].includes(e.key)) setTool(TOOLS[+e.key-1].id);
   else if(e.key.toLowerCase()==="p") print();
